@@ -1,18 +1,22 @@
 package cc.gilmore.audioplayer;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.OpenableColumns;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,6 +29,10 @@ import cc.gilmore.audioplayer.database.AppDatabase;
 import cc.gilmore.audioplayer.model.Song;
 import cc.gilmore.audioplayer.service.AudioPlayerService;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements SongAdapter.OnSon
     private Button shuffleButton;
 
     private Handler handler = new Handler();
+    private static final int READ_REQUEST_CODE = 42;
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -125,8 +134,12 @@ public class MainActivity extends AppCompatActivity implements SongAdapter.OnSon
 
         Button uploadButton = findViewById(R.id.upload_button);
         uploadButton.setOnClickListener(v -> {
-            Intent uploadIntent = new Intent(MainActivity.this, FileUploadActivity.class);
-            startActivity(uploadIntent);
+//            Intent uploadIntent = new Intent(MainActivity.this, FileUploadActivity.class);
+//            startActivity(uploadIntent);
+            Intent uploadIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            uploadIntent.addCategory(Intent.CATEGORY_OPENABLE);
+            uploadIntent.setType("audio/*");
+            startActivityForResult(uploadIntent, READ_REQUEST_CODE);
         });
 
         loadSongs();
@@ -234,6 +247,67 @@ public class MainActivity extends AppCompatActivity implements SongAdapter.OnSon
             seekBar.setProgress(audioService.getCurrentPosition());
             handler.postDelayed(this::updateSeekBar, 1000);
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        super.onActivityResult(requestCode, resultCode, resultData);
+        if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            if (resultData != null) {
+                Uri uri = resultData.getData();
+                String fileName = getFileName(uri);
+//                selectedFileTextView.setText(fileName);
+                uploadFile(uri, fileName);
+            }
+        }
+    }
+
+    private String getFileName(Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            try (android.database.Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    if (nameIndex >= 0) {
+                        result = cursor.getString(nameIndex);
+                    }
+                }
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
+    }
+
+    private void uploadFile(Uri uri, String fileName) {
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+            File file = new File(getFilesDir(), fileName);
+            try (OutputStream output = new FileOutputStream(file)) {
+                byte[] buffer = new byte[4 * 1024]; // 4k buffer
+                int read;
+                while ((read = inputStream.read(buffer)) != -1) {
+                    output.write(buffer, 0, read);
+                }
+                output.flush();
+            }
+            saveSongToDatabase(fileName, file.getAbsolutePath());
+            Toast.makeText(this, "File uploaded successfully", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Log.e("FileUploadActivity", "Error uploading file", e);
+            Toast.makeText(this, "Error uploading file", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void saveSongToDatabase(String fileName, String filePath) {
+        AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+        Song song = new Song(fileName, "Unknown Artist", "Unknown Album", filePath, null, 0);
+        new Thread(() -> db.songDao().insert(song)).start();
     }
 
 }
