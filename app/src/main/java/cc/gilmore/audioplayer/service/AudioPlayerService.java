@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 import cc.gilmore.audioplayer.model.Song;
 
@@ -45,7 +46,11 @@ public class AudioPlayerService extends Service {
     }
 
     public void playSong(int index) {
-        if (playlist == null || playlist.isEmpty()) return;
+        //Log.d("AudioPlayerService", "playSong: " + index);
+        if (playlist == null || playlist.isEmpty()) {
+            Log.d("AudioPlayerService", "playlist is empty");
+            return;
+        }
 
         currentSongIndex = index;
         Song song = playlist.get(currentSongIndex);
@@ -57,6 +62,7 @@ public class AudioPlayerService extends Service {
             mediaPlayer.start();
         } catch (IOException e) {
             e.printStackTrace();
+            Log.e("AudioPlayerService", "Error playing song: " + e.getMessage());
         }
     }
 

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Musika</string>
+    <string name="app_name">Musika v0.1</string>
     <string name="play">Play</string>
     <string name="pause">Pause</string>
     <string name="next">Next</string>
