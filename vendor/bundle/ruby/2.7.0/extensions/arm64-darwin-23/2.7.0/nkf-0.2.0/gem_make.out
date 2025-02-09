@@ -1,0 +1,15 @@
+current directory: /Users/mikegilmore/AndroidStudioProjects/Musika/Musika/vendor/bundle/ruby/2.7.0/gems/nkf-0.2.0/ext/nkf
+/Users/mikegilmore/.rvm/rubies/ruby-2.7.2/bin/ruby -I /Users/mikegilmore/.rvm/rubies/ruby-2.7.2/lib/ruby/2.7.0 -r ./siteconf20250209-10105-14p0dko.rb extconf.rb
+creating Makefile
+
+current directory: /Users/mikegilmore/AndroidStudioProjects/Musika/Musika/vendor/bundle/ruby/2.7.0/gems/nkf-0.2.0/ext/nkf
+make "DESTDIR=" clean
+
+current directory: /Users/mikegilmore/AndroidStudioProjects/Musika/Musika/vendor/bundle/ruby/2.7.0/gems/nkf-0.2.0/ext/nkf
+make "DESTDIR="
+compiling nkf.c
+linking shared-object nkf.bundle
+
+current directory: /Users/mikegilmore/AndroidStudioProjects/Musika/Musika/vendor/bundle/ruby/2.7.0/gems/nkf-0.2.0/ext/nkf
+make "DESTDIR=" install
+/opt/homebrew/opt/coreutils/bin/ginstall -c -m 0755 nkf.bundle ./.gem.20250209-10105-15guqrz
