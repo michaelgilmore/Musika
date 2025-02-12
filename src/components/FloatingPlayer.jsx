@@ -4,22 +4,17 @@ import { useSharedValue } from 'react-native-reanimated';
 import { Slider } from 'react-native-awesome-slider';
 
 import { NextButton, PlayPauseButton, PreviousButton } from './PlayControls';
+import MovingText from './MovingText';
 
 import { colors } from '../constant/colors';
+import { spacing } from '../constant/dimensions';
 
 const imageUrl = "https://ncsmusic.s3.eu-west-1.amazonaws.com/tracks/000/001/643/325x325/karma-1709859652-YtrQEhSzIV.jpg";
 
 const FloatingPlayer = () => {
-    const progress = useSharedValue(50);
+    const progress = useSharedValue(0.2);
     const min = useSharedValue(0);
-    const max = useSharedValue(100);
-
-//     disableMinTrackTintColor: ?
-//     maximumTrackTintColor: after thumb
-//     minimumTrackTintColor: before thumb
-//     cacheTrackTintColor: ?
-//     bubbleBackgroundColor: ?
-//     heartbeatColor: ?
+    const max = useSharedValue(1);
 
     return (
         <View>
@@ -27,26 +22,44 @@ const FloatingPlayer = () => {
                 <Slider
                     style={{zIndex: 10}}
                     progress={progress}
+                    value={progress.value}
+                    onValueChange={(value) => progress.value = value}
                     minimumValue={min}
                     maximumValue={max}
                     theme={{
-                        disableMinTrackTintColor: "#FF0000",
                         maximumTrackTintColor: "#ffffff",
                         minimumTrackTintColor: "#0000ff",
-                        cacheTrackTintColor: "#00ff00",
-                        bubbleBackgroundColor: "#0000ff",
-                        heartbeatColor: "#00ff00",
                     }}
                     containerStyle={{height: 6}}
+                    renderBubble={() =>
+                        <View style={{
+                            width: 50,
+                            height: 20,
+                            backgroundColor: 'white',
+                            borderRadius: 4,
+                            alignItems: 'center',
+                            justifyContent: 'center'}}>
+                                <Text>{progress.value}</Text>
+                        </View>}
                 />
             </View>
             <TouchableOpacity style={styles.container}>
-                <Image source={{uri: imageUrl}} style={styles.coverImage} />
+                <Image
+                    source={{uri: imageUrl}}
+                    style={styles.coverImage}
+                    zIndex={5}
+                />
                 <View style={styles.nameContainer}>
-                    <Text style={styles.title}>Song Name</Text>
+{/*                     <Text style={styles.title}>Song Name</Text> */}
+                    <MovingText
+                        text="This is a name that is long enough"
+                        animationThreshold={20}
+                        style={styles.title}
+                        zIndex={0}
+                    />
                     <Text style={styles.artist}>Artist Name</Text>
                 </View>
-                <View style={styles.playControls}>
+                <View style={styles.playControls} zIndex={5}>
                     <PreviousButton />
                     <PlayPauseButton />
                     <NextButton />
@@ -73,11 +86,18 @@ const styles = StyleSheet.create({
     title: {
         color: colors.textPrimary,
     },
+    titleContainer: {
+        flex: 1,
+        paddingHorizontal: spacing.sm,
+        overflow: 'hidden',
+        marginLeft: spacing.sm,
+        marginRight: spacing.lg,
+    },
     artist: {
         color: colors.textSecondary,
     },
     nameContainer: {
-        marginLeft: 10,
+        marginLeft: 16,
     },
     playControls: {
         flex: 1,
