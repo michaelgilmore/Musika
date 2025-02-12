@@ -14,7 +14,7 @@
             android:id="@+id/upload_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Upload Audio File" />
+            android:text="@string/uploadFile" />
 
     </LinearLayout>
 
