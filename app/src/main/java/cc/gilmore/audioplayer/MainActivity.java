@@ -5,8 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -26,24 +29,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements SongAdapter.OnSongClickListener {
-    static {
-        System.out.println("MyApplication: Static initializer block");
-    }
-
     private AudioPlayerService audioService;
     private boolean serviceBound = false;
     private List<Song> songList = new ArrayList<>();
     private SongAdapter songAdapter;
-    private List<Song> playlist;
 
     private TextView songTitleView;
     private TextView artistView;
     private ImageView albumCoverView;
     private SeekBar seekBar;
-    private Button playPauseButton;
-    private Button nextButton;
-    private Button previousButton;
+    private ImageButton playPauseButton;
+    private ImageButton nextButton;
+    private ImageButton previousButton;
     private Button shuffleButton;
+
+    private Handler handler = new Handler();
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements SongAdapter.OnSon
             AudioPlayerService.LocalBinder binder = (AudioPlayerService.LocalBinder) service;
             audioService = binder.getService();
             serviceBound = true;
-            audioService.setPlaylist(playlist);
+            audioService.setPlaylist(songList);
         }
 
         @Override
@@ -65,19 +65,55 @@ public class MainActivity extends AppCompatActivity implements SongAdapter.OnSon
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        songTitleView = findViewById(R.id.song_title);
-        artistView = findViewById(R.id.artist);
+        songTitleView = findViewById(R.id.now_playing_title);
+        artistView = findViewById(R.id.now_playing_artist);
         albumCoverView = findViewById(R.id.album_cover);
-        seekBar = findViewById(R.id.seek_bar);
-        playPauseButton = findViewById(R.id.play_pause_button);
-        nextButton = findViewById(R.id.next_button);
-        previousButton = findViewById(R.id.previous_button);
+        seekBar = findViewById(R.id.now_playing_seek_bar);
+        nextButton = findViewById(R.id.now_playing_next);
+        previousButton = findViewById(R.id.now_playing_previous);
         shuffleButton = findViewById(R.id.shuffle_button);
+        playPauseButton = findViewById(R.id.now_playing_play_pause);
 
-        // Initialize playlist (this should be populated from your database in a real app)
-        playlist = new ArrayList<>();
-        playlist.add(new Song("Song 1", "Artist 1", "Album 1", "path/to/song1.mp3", "https://example.com/album1.jpg", 180000));
-        playlist.add(new Song("Song 2", "Artist 2", "Album 2", "path/to/song2.mp3", "https://example.com/album2.jpg", 200000));
+        playPauseButton.setOnClickListener(v -> {
+            if (serviceBound) {
+                if (audioService.isPlaying()) {
+                    audioService.pause();
+                } else {
+                    audioService.resume();
+                }
+                updatePlaybackState();
+            }
+        });
+
+        previousButton.setOnClickListener(v -> {
+            if (serviceBound) {
+                audioService.previous();
+                updateNowPlayingInfo();
+            }
+        });
+
+        nextButton.setOnClickListener(v -> {
+            if (serviceBound) {
+                audioService.next();
+                updateNowPlayingInfo();
+            }
+        });
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser && serviceBound) {
+                    audioService.seekTo(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+
 
         Intent intent = new Intent(this, AudioPlayerService.class);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
@@ -98,11 +134,12 @@ public class MainActivity extends AppCompatActivity implements SongAdapter.OnSon
         playPauseButton.setOnClickListener(v -> {
             if (audioService.isPlaying()) {
                 audioService.pause();
-                playPauseButton.setText("Play");
+//                playPauseButton.setText("Play");
             } else {
                 audioService.resume();
-                playPauseButton.setText("Pause");
+//                playPauseButton.setText("Pause");
             }
+            updatePlaybackState();
         });
 
         nextButton.setOnClickListener(v -> audioService.next());
@@ -145,6 +182,7 @@ public class MainActivity extends AppCompatActivity implements SongAdapter.OnSon
             unbindService(serviceConnection);
             serviceBound = false;
         }
+        handler.removeCallbacksAndMessages(null);
     }
 
     private void loadSongs() {
@@ -167,9 +205,36 @@ public class MainActivity extends AppCompatActivity implements SongAdapter.OnSon
         if (serviceBound) {
             int index = songList.indexOf(song);
             audioService.playSong(index);
-            Intent intent = new Intent(MainActivity.this, NowPlayingActivity.class);
-            startActivity(intent);
+            updateUI(song);
         }
     }
+
+    private void updatePlaybackState() {
+        if (serviceBound) {
+            Log.d("MainActivity", "audioService.isPlaying(): " + audioService.isPlaying());
+            playPauseButton.setImageResource(audioService.isPlaying() ?
+                    R.drawable.ic_pause : R.drawable.ic_play);
+        }
+    }
+
+    private void updateNowPlayingInfo() {
+        if (serviceBound) {
+            Song currentSong = audioService.getCurrentSong();
+            if (currentSong != null) {
+                songTitleView.setText(currentSong.title);
+                artistView.setText(currentSong.artist);
+                seekBar.setMax(audioService.getDuration());
+                updateSeekBar();
+            }
+        }
+    }
+
+    private void updateSeekBar() {
+        if (serviceBound && audioService.isPlaying()) {
+            seekBar.setProgress(audioService.getCurrentPosition());
+            handler.postDelayed(this::updateSeekBar, 1000);
+        }
+    }
+
 }
 

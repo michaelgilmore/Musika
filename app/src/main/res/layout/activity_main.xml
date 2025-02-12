@@ -16,13 +16,6 @@
             android:layout_height="wrap_content"
             android:text="Upload Audio File" />
 
-        <Button
-            android:id="@+id/now_playing_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Now Playing"
-            android:layout_marginLeft="16dp"/>
-
     </LinearLayout>
 
     <ImageView
@@ -33,25 +26,59 @@
         android:scaleType="centerCrop" />
 
     <TextView
-        android:id="@+id/song_title"
+        android:id="@+id/now_playing_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
 
     <TextView
-        android:id="@+id/artist"
+        android:id="@+id/now_playing_artist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:textSize="16sp" />
+        android:textSize="18sp"
+        android:layout_marginBottom="24dp"/>
 
     <SeekBar
-        android:id="@+id/seek_bar"
+        android:id="@+id/now_playing_seek_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp" />
+        android:layout_marginBottom="24dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <ImageButton
+            android:id="@+id/now_playing_previous"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/ic_previous"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Previous"/>
+
+        <ImageButton
+            android:id="@+id/now_playing_play_pause"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:src="@drawable/ic_play"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:contentDescription="Play/Pause"/>
+
+        <ImageButton
+            android:id="@+id/now_playing_next"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/ic_next"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Next"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -59,24 +86,6 @@
         android:orientation="horizontal"
         android:gravity="center"
         android:layout_marginTop="16dp">
-
-        <Button
-            android:id="@+id/previous_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/previous" />
-
-        <Button
-            android:id="@+id/play_pause_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/play" />
-
-        <Button
-            android:id="@+id/next_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/next" />
 
         <Button
             android:id="@+id/shuffle_button"
