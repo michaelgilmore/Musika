@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Musika</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="shuffle">Shuffle</string>
+</resources>
+
