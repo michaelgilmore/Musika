@@ -12,6 +12,8 @@ export const PreviousButton = () => {
 }
 
 export const PlayPauseButton = () => {
+//     console.log('Play/Pause button pressed');
+
     const isPlaying = false;
 
     return (

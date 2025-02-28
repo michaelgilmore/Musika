@@ -24,11 +24,11 @@ const MovingText = ({text, animationThreshold, style}) => {
             1000,
             withRepeat(
                 withTiming(
-                    -textWidth,
-                    {duration: 5000, easing: Easing.linear}
+                    -(textWidth*3),
+                    {duration: 8000, easing: Easing.linear}
                 ),
                 -1,
-                true
+                false //reverse
             )
         );
     }, [translateX, text, animationThreshold, textWidth]);
@@ -39,8 +39,8 @@ const MovingText = ({text, animationThreshold, style}) => {
              animatedStyle,
              style,
              shouldAnimate && {
-                 paddingLeft: 16,
-                 width: 200,
+                 paddingLeft: 100,
+                 width: 999,
              },
          ]}>
             {text}

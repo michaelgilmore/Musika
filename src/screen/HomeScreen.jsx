@@ -9,6 +9,7 @@ import SongCard from '../components/SongCard';
 import { colors } from '../constant/colors';
 
 const HomeScreen = () => {
+//     console.log('HomeScreen()');
     return (
         <View style={styles.container}>
             <Header />

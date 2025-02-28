@@ -1,20 +1,28 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
+import { useNavigation } from '@react-navigation/native';
 import { Slider } from 'react-native-awesome-slider';
 
 import { NextButton, PlayPauseButton, PreviousButton } from './PlayControls';
 import MovingText from './MovingText';
 
 import { colors } from '../constant/colors';
-import { spacing } from '../constant/dimensions';
+import { spacing, fontSize } from '../constant/dimensions';
+import { fontFamilies } from '../constant/fonts';
 
 const imageUrl = "https://ncsmusic.s3.eu-west-1.amazonaws.com/tracks/000/001/643/325x325/karma-1709859652-YtrQEhSzIV.jpg";
 
 const FloatingPlayer = () => {
+    const navigation = useNavigation();
     const progress = useSharedValue(0.2);
+    const [progressVal, setProgressVal] = useState(0.2);
     const min = useSharedValue(0);
     const max = useSharedValue(1);
+
+    const handleOpenPlayerScreen = () => {
+        navigation.navigate('PLAYER_SCREEN');
+    }
 
     return (
         <View>
@@ -23,12 +31,16 @@ const FloatingPlayer = () => {
                     style={{zIndex: 10}}
                     progress={progress}
                     value={progress.value}
-                    onValueChange={(value) => progress.value = value}
+                    onValueChange={(value) => {
+//                         console.log(`Slider value changed to: ${value}`);
+                        progress.value = value;
+                        setProgressVal(value);
+                    }}
                     minimumValue={min}
                     maximumValue={max}
                     theme={{
-                        maximumTrackTintColor: "#ffffff",
-                        minimumTrackTintColor: "#0000ff",
+                        maximumTrackTintColor: colors.progressPastColor,
+                        minimumTrackTintColor: colors.progressFutureColor,
                     }}
                     containerStyle={{height: 6}}
                     renderBubble={() =>
@@ -39,17 +51,17 @@ const FloatingPlayer = () => {
                             borderRadius: 4,
                             alignItems: 'center',
                             justifyContent: 'center'}}>
-                                <Text>{progress.value}</Text>
+                                <Text>{progressVal}</Text>
                         </View>}
                 />
             </View>
-            <TouchableOpacity style={styles.container}>
+            <TouchableOpacity style={styles.container} onPress={handleOpenPlayerScreen}>
                 <Image
                     source={{uri: imageUrl}}
                     style={styles.coverImage}
                     zIndex={5}
                 />
-                <View style={styles.nameContainer}>
+                <View style={styles.titleContainer}>
 {/*                     <Text style={styles.title}>Song Name</Text> */}
                     <MovingText
                         text="This is a name that is long enough"
@@ -85,6 +97,9 @@ const styles = StyleSheet.create({
     },
     title: {
         color: colors.textPrimary,
+        fontSize: fontSize.lg,
+        fontFamily: fontFamilies.reg,
+        paddingRight: spacing.xl,
     },
     titleContainer: {
         flex: 1,
@@ -95,6 +110,7 @@ const styles = StyleSheet.create({
     },
     artist: {
         color: colors.textSecondary,
+        fontSize: fontSize.md,
     },
     nameContainer: {
         marginLeft: 16,

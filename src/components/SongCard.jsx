@@ -6,10 +6,10 @@ import { fontSize, spacing } from '../constant/dimensions';
 
 const imageUrl = 'https://ncsmusic.s3.eu-west-1.amazonaws.com/tracks/000/001/644/325x325/pretty-afternoon-1709859658-TKAtqZGQtZ.jpg';
 
-const SongCard = () => {
+const SongCard = ({containerStyle, imageStyle}) => {
     return (
-        <TouchableOpacity style={styles.container}>
-            <Image source={{uri: imageUrl}} style={styles.coverImage} />
+        <TouchableOpacity style={[styles.container, containerStyle]}>
+            <Image source={{uri: imageUrl}} style={[styles.coverImage, imageStyle]} />
             <Text style={styles.songName}>Song Name</Text>
             <Text style={styles.artistName}>Artist Name</Text>
         </TouchableOpacity>
@@ -20,8 +20,8 @@ export default SongCard;
 
 const styles = StyleSheet.create({
     container: {
-        height: 320,
-        width: 250,
+//         height: 320,
+//         width: 250,
     },
     coverImage: {
         width: 250,

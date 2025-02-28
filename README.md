@@ -4,12 +4,16 @@
 # Initial version
 
 https://www.youtube.com/watch?v=WiLs1LmWQPE
-2:17:12
+3:13
+
+
+npm install @react-navigation/drawer
 
 
 Run instructions for Android:
 • Have an Android emulator running (quickest way to get started), or a device connected.
-• npx react-native run-android
+• npx react-native start (in one terminal)
+• npx react-native run-android (in another)
 
 Run instructions for iOS:
 • npx react-native run-ios
@@ -19,7 +23,6 @@ Run instructions for iOS:
 
 Run instructions for macOS:
 • See https://aka.ms/ReactNativeGuideMacOS for the latest up-to-date instructions.
-
 
 
 
@@ -127,7 +130,25 @@ To learn more about React Native, take a look at the following resources:
 
 # To fix email address
 
-git config user.name "New Author Name"
-git config user.email "<email@address.example>"
+git config user.name "Mike"
+git config user.email "<githubmichaelgilmore@gilmore.cc>"
 git rebase -r <some commit before all of your bad commits> \
 --exec 'git commit --amend --no-edit --reset-author'
+
+
+# rnfes - copy paste for new screens
+
+import { StyleSheet, Text, View } from 'react-native'
+import React from 'react'
+
+const Screen = () => {
+  return (
+    <View>
+      <Text>Screen</Text>
+    </View>
+  )
+}
+
+export default Screen;
+
+const styles = StyleSheet.create({})
